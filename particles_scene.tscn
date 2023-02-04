@@ -1,0 +1,105 @@
+[gd_scene load_steps=13 format=3 uid="uid://5nffyso0cr6i"]
+
+[ext_resource type="Texture2D" uid="uid://c74qyrgv2keh" path="res://LensDirt00.png" id="1_p0ss4"]
+[ext_resource type="Script" path="res://CameraOffset.gd" id="2_5hh4h"]
+
+[sub_resource type="Gradient" id="Gradient_vm4jh"]
+offsets = PackedFloat32Array(0, 0.0312371, 0.227992, 0.718864, 1)
+colors = PackedColorArray(80, 80, 80, 1, 20, 20, 0, 1, 1, 0.176471, 0.227451, 1, 0.0558521, 0.280306, 0.802211, 1, 0.451773, 0, 0.00265598, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_ixvo1"]
+gradient = SubResource("Gradient_vm4jh")
+use_hdr = true
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_jxg62"]
+emission_shape = 6
+emission_ring_axis = Vector3(0, 0, 1)
+emission_ring_height = 1.0
+emission_ring_radius = 2.0
+emission_ring_inner_radius = 2.0
+gravity = Vector3(2.08165e-12, 2.08165e-12, 2.08165e-12)
+tangential_accel_min = -61.65
+tangential_accel_max = -15.77
+color_ramp = SubResource("GradientTexture1D_ixvo1")
+turbulence_enabled = true
+turbulence_noise_scale = 3.51
+turbulence_noise_speed = Vector3(0.5, 0.5, 2.08165e-12)
+turbulence_noise_speed_random = 6.38
+turbulence_influence_min = 0.06
+turbulence_influence_max = 0.16
+collision_mode = 1
+collision_friction = 0.59
+collision_bounce = 0.4
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_64688"]
+shading_mode = 0
+vertex_color_use_as_albedo = true
+billboard_mode = 1
+
+[sub_resource type="QuadMesh" id="QuadMesh_wnbqj"]
+material = SubResource("StandardMaterial3D_64688")
+size = Vector2(0.05, 0.05)
+
+[sub_resource type="Environment" id="Environment_wqlet"]
+background_mode = 1
+ssr_enabled = true
+ssr_max_steps = 133
+ssr_fade_in = 1.15912
+ssr_fade_out = 2.2974
+glow_enabled = true
+glow_strength = 1.04
+glow_bloom = 0.13
+glow_blend_mode = 0
+glow_map_strength = 1.0
+glow_map = ExtResource("1_p0ss4")
+volumetric_fog_albedo = Color(0.396078, 0.396078, 0.396078, 1)
+
+[sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_gxm7n"]
+dof_blur_far_distance = 18.61
+dof_blur_near_enabled = true
+dof_blur_near_distance = 3.34
+dof_blur_near_transition = -1.0
+dof_blur_amount = 0.18
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_scukc"]
+size = Vector3(10, 2, 10)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_e47ft"]
+albedo_color = Color(0.0470588, 0.0470588, 0.0470588, 1)
+metallic = 0.7
+metallic_specular = 0.56
+roughness = 0.29
+
+[sub_resource type="BoxMesh" id="BoxMesh_l3wt4"]
+material = SubResource("StandardMaterial3D_e47ft")
+size = Vector3(10, 2, 10)
+
+[node name="ParticlesScene" type="Node3D"]
+
+[node name="Portal" type="GPUParticles3D" parent="."]
+amount = 10000
+visibility_aabb = AABB(-4, -4, -0.335883, 8, 8, 0.671765)
+process_material = SubResource("ParticleProcessMaterial_jxg62")
+draw_pass_1 = SubResource("QuadMesh_wnbqj")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_wqlet")
+camera_attributes = SubResource("CameraAttributesPractical_gxm7n")
+
+[node name="Floor" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.06484, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
+shape = SubResource("BoxShape3D_scukc")
+
+[node name="GPUParticlesCollisionBox3D" type="GPUParticlesCollisionBox3D" parent="Floor"]
+size = Vector3(10, 2, 10)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor"]
+mesh = SubResource("BoxMesh_l3wt4")
+
+[node name="CameraOffset" type="Node3D" parent="."]
+script = ExtResource("2_5hh4h")
+
+[node name="Camera3D" type="Camera3D" parent="CameraOffset"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5.77493)
